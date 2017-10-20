@@ -57,10 +57,28 @@ def _calc_times():
     app.logger.debug("request.args: {}".format(request.args))
     # FIXME: These probably aren't the right open and close times
     # and brevets may be longer than 200km
-    open_time = acp_times.open_time(km, 200, arrow.now().isoformat)
-    close_time = acp_times.close_time(km, 200, arrow.now().isoformat)
+    start_time = arrow.get(flask.session['begin_date'] + "" + flask.session['begin_time']).isoformat()
+    open_time = acp_times.open_time(km, flask.session['distance'], start_time)
+    close_time = acp_times.close_time(km, flask.session['distance'], start_time)
     result = {"open": open_time, "close": close_time}
     return flask.jsonify(result=result)
+
+app.route("/_distance")
+def distance():
+    dis = request.args.get('distance', 200, type=int)
+    flask.session['distance'] = dis
+    return flask.jsonify(result="{}")
+
+@app.route("/_begin_date")
+def begin_data():
+    date = request.args.get('date', 200, type=str)
+    flask.session['begin_date'] = date
+    return flask.jsonify(result="{}")
+@app.route("/_begin_time")
+def end_data():
+    date = request.args.get('date', 200, type=str)
+    flask.session['begin_time'] = date
+    return flask.jsonify(result="{}")
 
 
 #############
